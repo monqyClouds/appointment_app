@@ -21,8 +21,7 @@ export const corsOptionsDelegate: CorsOptionsDelegate<Request> = function (
       origin: function (origin: string | undefined, callback) {
         if (
           (!origin && allowUndefinedOrigin) ||
-          (origin &&
-            allowedOrigins.includes(origin as (typeof allowedOrigins)[number]))
+          (origin && allowedOrigins.includes(origin))
         ) {
           callback(null, true);
         } else {
