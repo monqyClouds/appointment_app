@@ -17,7 +17,10 @@ export enum ErrorTypes {
 
 export function errorDispatcher(
   res: Response,
-  errorData: {type: ErrorTypes; message: string; errors: unknown},
+  errorData: {type: ErrorTypes; message: string; errors?: unknown} = {
+    type: ErrorTypes.ServerError,
+    message: 'Unexpected error occured',
+  },
 ) {
   const {type, message, errors} = errorData;
   let status: number;
@@ -63,7 +66,7 @@ export function errorDispatcher(
       status = 500;
   }
 
-  res.status(status).json({
+  return res.status(status).json({
     message,
     errors,
   });

@@ -1,7 +1,7 @@
 import {PrismaClient} from '@prisma/client';
 import {ENVIRONMENT, DATABASE_URL} from '../config';
 
-let prisma: PrismaClient | undefined;
+let prisma: PrismaClient;
 
 if (ENVIRONMENT === 'production') {
   prisma = new PrismaClient({
@@ -31,4 +31,4 @@ export async function disconnectDB() {
   await prisma!.$disconnect();
 }
 
-export default prisma!;
+export default prisma;
