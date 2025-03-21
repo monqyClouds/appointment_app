@@ -21,13 +21,15 @@ model doctor {
 }
 
 model slot {
-  id        String   @id
+  id        String    @id
   doctorId  String
   startTime DateTime
   endTime   DateTime
-  isBooked  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  doctor    doctor   @relation(fields: [doctorId], references: [id])
+  isBooked  Boolean   @default(false)
+  bookedAt  DateTime?
+  bookedBy  String?
+  createdAt DateTime  @default(now())
+  doctor    doctor    @relation(fields: [doctorId], references: [id])
 
   @@unique([doctorId, startTime])
   @@index([startTime, endTime])
