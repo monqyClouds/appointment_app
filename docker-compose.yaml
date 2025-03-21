@@ -1,0 +1,45 @@
+services:
+  appointment_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: sh -c "yarn prisma:migrate:prod && node dist/src/server.js"
+    environment:
+      - DATABASE_URL=mysql://user:password@mysql:3306/appointment_app
+      - ALLOW_UNDEFINED_ORIGIN='true'
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=appointment_app
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'user',
+          '-ppassword',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mysql-data:
