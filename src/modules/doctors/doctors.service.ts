@@ -1,9 +1,15 @@
-import {CreateDoctorDto, CreateSlotsDto, GetDoctorsQueryDto} from './dto';
+import {
+  CreateDoctorDto,
+  CreateSlotsDto,
+  GetAvailableSlotsQueryDto,
+  GetBookedSlotsQueryDto,
+  GetDoctorsQueryDto,
+} from './dto';
 import prisma from '../../utils/prisma';
 import {createId} from '@paralleldrive/cuid2';
 import {Response} from 'express';
 import {logger} from '../../middlewares';
-import {errorDispatcher, ErrorTypes} from '../../utils';
+import {errorDispatcher, ErrorTypes, timer} from '../../utils';
 import {PrismaClientKnownRequestError} from '@prisma/client/runtime/library';
 import dayjs, {Dayjs} from 'dayjs';
 
@@ -83,6 +89,91 @@ export async function createSlots(
       });
     }
 
+    logger.error(err);
+    return errorDispatcher(res);
+  }
+}
+
+export async function getAvailableSlots(
+  doctorId: string,
+  query: GetAvailableSlotsQueryDto,
+  res: Response,
+) {
+  try {
+    const filter = {
+      doctorId,
+      isBooked: false,
+      startTime: query.date
+        ? {
+            gte: timer(query.date).startOf('day').toDate(),
+            lte: timer(query.date).endOf('day').toDate(),
+          }
+        : undefined,
+    };
+
+    const [availableSlots, count] = await Promise.all([
+      prisma.slot.findMany({
+        where: filter,
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+        },
+        orderBy: {
+          startTime: 'asc',
+        },
+        take: query.limit ?? 20,
+        skip: query.skip,
+      }),
+      prisma.slot.count({where: filter}),
+    ]);
+
+    return {availableSlots, count};
+  } catch (err) {
+    logger.error(err);
+    return errorDispatcher(res);
+  }
+}
+
+export async function getBookedSlots(
+  doctorId: string,
+  query: GetBookedSlotsQueryDto,
+  res: Response,
+) {
+  try {
+    const filter = {
+      doctorId,
+      isBooked: true,
+      startTime:
+        query.startDate || query.endDate
+          ? {
+              gte: timer(query.startDate).startOf('day').toDate(),
+              lte: timer(query.endDate).endOf('day').toDate(),
+            }
+          : undefined,
+    };
+
+    const [bookedSlots, count] = await Promise.all([
+      prisma.slot.findMany({
+        where: filter,
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          bookedBy: true,
+          bookedAt: true,
+        },
+        orderBy: {
+          startTime: 'asc',
+        },
+        take: query.limit ?? 20,
+        skip: query.skip,
+      }),
+      prisma.slot.count({where: filter}),
+    ]);
+
+    return {bookedSlots, count};
+  } catch (err) {
     logger.error(err);
     return errorDispatcher(res);
   }

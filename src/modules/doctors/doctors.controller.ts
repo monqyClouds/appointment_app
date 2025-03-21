@@ -1,5 +1,11 @@
 import {Request, Response} from 'express';
-import {CreateDoctorDto, CreateSlotsDto, GetDoctorsQueryDto} from './dto';
+import {
+  CreateDoctorDto,
+  CreateSlotsDto,
+  GetAvailableSlotsQueryDto,
+  GetBookedSlotsQueryDto,
+  GetDoctorsQueryDto,
+} from './dto';
 import * as doctorsService from './doctors.service';
 import {successResDispatcher} from '../../utils';
 
@@ -29,4 +35,24 @@ export async function createSlots(req: Request, res: Response) {
   );
 
   successResDispatcher(res, {statusCode: 201, data});
+}
+
+export async function getAvailableSlots(req: Request, res: Response) {
+  const data = await doctorsService.getAvailableSlots(
+    req.params.id,
+    req.query as unknown as GetAvailableSlotsQueryDto,
+    res,
+  );
+
+  successResDispatcher(res, {statusCode: 200, data});
+}
+
+export async function getBookedSlots(req: Request, res: Response) {
+  const data = await doctorsService.getBookedSlots(
+    req.params.id,
+    req.query as unknown as GetBookedSlotsQueryDto,
+    res,
+  );
+
+  successResDispatcher(res, {statusCode: 200, data});
 }

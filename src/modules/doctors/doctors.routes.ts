@@ -4,6 +4,8 @@ import {validateBodyDto, validateQueryDto} from '../../middlewares';
 import {
   createDoctorSchema,
   createSlotSchema,
+  getAvailableSlotsQuerySchema,
+  getBookedSlotsQuerySchema,
   getDoctorsQuerySchema,
 } from './dto';
 
@@ -19,6 +21,18 @@ router.get(
   '/',
   validateQueryDto(getDoctorsQuerySchema),
   doctorsControllers.getDoctors,
+);
+
+router.get(
+  '/:id/available_slots',
+  validateQueryDto(getAvailableSlotsQuerySchema),
+  doctorsControllers.getAvailableSlots,
+);
+
+router.get(
+  '/:id/bookings',
+  validateQueryDto(getBookedSlotsQuerySchema),
+  doctorsControllers.getBookedSlots,
 );
 
 router.post(
