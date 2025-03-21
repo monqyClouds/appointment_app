@@ -1,6 +1,5 @@
 import pinoHttp from 'pino-http';
 import pino from 'pino';
-import 'pino-pretty';
 import {createId} from '@paralleldrive/cuid2';
 import {Response, Request} from 'express';
 import {ENVIRONMENT} from '../config';
