@@ -1,6 +1,6 @@
 # Appointment App
 
-This is a small Express application designed to manage appointments, doctors, and slots. It provides endpoints to create doctors, book slots, and retrieve available and booked slots for doctors.
+This is an Express application designed to manage doctors' medical appointments and bookings. It provides endpoints to create doctors, book appointment slots, and retrieve available and booked slots for doctors.
 
 ## Features
 
