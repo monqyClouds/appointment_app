@@ -15,4 +15,20 @@ model doctor {
   lastName  String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  slot      slot[]
+
+  @@index([firstName, lastName])
+}
+
+model slot {
+  id        String   @id
+  doctorId  String
+  startTime DateTime
+  endTime   DateTime
+  isBooked  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  doctor    doctor   @relation(fields: [doctorId], references: [id])
+
+  @@unique([doctorId, startTime])
+  @@index([startTime, endTime])
 }
