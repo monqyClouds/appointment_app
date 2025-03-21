@@ -3,12 +3,13 @@ import prisma from '../../utils/prisma';
 import {errorDispatcher, ErrorTypes} from '../../utils';
 import {logger} from '../../middlewares';
 import {BookSlotDto} from './dto';
+import {createId} from '@paralleldrive/cuid2';
 
 export async function bookSlot(id: string, dto: BookSlotDto, res: Response) {
   try {
     const slot = await prisma.slot.findUnique({
       where: {id},
-      select: {isBooked: true},
+      select: {booking: {select: {id: true}}},
     });
 
     if (!slot) {
@@ -18,25 +19,24 @@ export async function bookSlot(id: string, dto: BookSlotDto, res: Response) {
       });
     }
 
-    if (slot.isBooked) {
+    if (slot.booking) {
       return errorDispatcher(res, {
         type: ErrorTypes.BadRequest,
         message: 'Slot already booked',
       });
     }
 
-    const bookedAt = new Date();
-
-    await prisma.slot.updateMany({
-      where: {id},
-      data: {isBooked: true, bookedAt, bookedBy: dto.fullName},
+    const booking = await prisma.booking.create({
+      data: {
+        id: createId(),
+        patientName: dto.fullName,
+        reason: dto.reason,
+        bookedAt: new Date(),
+        slotId: id,
+      },
     });
 
-    return {
-      id,
-      isBooked: true,
-      bookedAt,
-    };
+    return booking;
   } catch (err) {
     logger.error(err);
     return errorDispatcher(res);

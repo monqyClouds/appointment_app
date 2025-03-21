@@ -127,6 +127,7 @@ npx prisma migrate deploy
     ```typescript
     {
       fullName: string; // Non-empty string
+      reason: string; // Non-empty string
     }
     ```
 

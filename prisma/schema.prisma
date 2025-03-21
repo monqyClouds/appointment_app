@@ -8,28 +8,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model booking {
+  id          String   @id
+  slotId      String   @unique
+  patientName String
+  reason      String
+  bookedAt    DateTime
+  slot        slot     @relation(fields: [slotId], references: [id])
+}
+
 model doctor {
-  id        String    @id
-  userName  String    @unique
-  firstName String
-  lastName  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  slot      slot[]
+  id           String    @id
+  userName     String    @unique
+  firstName    String
+  lastName     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+  appointments slot[]
 
   @@index([firstName, lastName])
 }
 
 model slot {
-  id        String    @id
+  id        String   @id
   doctorId  String
   startTime DateTime
   endTime   DateTime
-  isBooked  Boolean   @default(false)
-  bookedAt  DateTime?
-  bookedBy  String?
-  createdAt DateTime  @default(now())
-  doctor    doctor    @relation(fields: [doctorId], references: [id])
+  createdAt DateTime @default(now())
+  doctor    doctor   @relation(fields: [doctorId], references: [id])
+  booking   booking?
 
   @@unique([doctorId, startTime])
   @@index([startTime, endTime])

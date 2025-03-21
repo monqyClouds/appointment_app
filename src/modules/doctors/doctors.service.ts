@@ -102,7 +102,7 @@ export async function getAvailableSlots(
   try {
     const filter = {
       doctorId,
-      isBooked: false,
+      booking: {is: null},
       startTime: query.date
         ? {
             gte: timer(query.date).startOf('day').toDate(),
@@ -143,7 +143,7 @@ export async function getBookedSlots(
   try {
     const filter = {
       doctorId,
-      isBooked: true,
+      booking: {isNot: null},
       startTime:
         query.startDate || query.endDate
           ? {
@@ -160,8 +160,14 @@ export async function getBookedSlots(
           id: true,
           startTime: true,
           endTime: true,
-          bookedBy: true,
-          bookedAt: true,
+          booking: {
+            select: {
+              id: true,
+              bookedAt: true,
+              patientName: true,
+              reason: true,
+            },
+          },
         },
         orderBy: {
           startTime: 'asc',
