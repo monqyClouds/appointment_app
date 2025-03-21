@@ -9,5 +9,6 @@ export function successResDispatcher(
   res: Response,
   payload: SuccessResponseStruct,
 ) {
-  res.status(payload.statusCode).json({data: payload.data});
+  if ((payload.data as {req: unknown})?.req) res;
+  else res.status(payload.statusCode).json({data: payload.data});
 }

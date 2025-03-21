@@ -27,10 +27,6 @@ process.on('SIGTERM', () => {
   handleShutdown();
 });
 
-process.on('uncaughtExceptionMonitor', async err => {
-  console.error(err);
-});
-
 function handleShutdown() {
   server.close(async () => {
     await disconnectDB();
